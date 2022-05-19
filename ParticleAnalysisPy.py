@@ -6,7 +6,7 @@ layout = [
         [sg.Frame("Raw Data Processing", [
                 [sg.Button("Process Stack Data", expand_x=True)],
                 [sg.Button("Stack From Images", expand_x=True)],
-                [sg.Button("Process Stack Data", expand_x=True)]
+                [sg.Button("Deglitch Stack", expand_x=True)]
         ], element_justification="center", expand_x=True, title_location=sg.TITLE_LOCATION_TOP)],
 
         [sg.Frame("Processed Data Analysis", [
@@ -17,8 +17,8 @@ layout = [
         ], element_justification="center", expand_x=True, title_location=sg.TITLE_LOCATION_TOP)],
 
         [sg.Frame("Processed Data Analysis", [
-                [sg.Button("ExploreParticles", expand_x=True)],
-                [sg.Button("RemoveBadParticles", expand_x=True)]
+                [sg.Button("Explore Particles", expand_x=True)],
+                [sg.Button("Remove Bad Particles", expand_x=True)]
         ], element_justification="center", expand_x=True, title_location=sg.TITLE_LOCATION_TOP)]
 ]
 
@@ -32,5 +32,29 @@ while True:
 
     if event == "Process Stack Data":
         process_stack_data()
+
+    if event == "Stack From Images":
+        sg.popup("Work in Progress")
+
+    if event == "Deglitch Stack":
+        sg.popup("Work in Progress")
+
+    if event == "DirLabelStruct":
+        sg.popup("Work in Progress")
+
+    if event == "StackLab":
+        sg.popup("Work in Progress")
+
+    if event == "CarbonMaps":
+        sg.popup("Work in Progress")
+
+    if event == "FullSpecCMaps":
+        sg.popup("Work in Progress")
+
+    if event == "Explore Particles":
+        sg.popup("Work in Progress")
+
+    if event == "Remove Bad Particles":
+        sg.popup("Work in Progress")
 
 window.close()

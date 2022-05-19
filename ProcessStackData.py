@@ -26,7 +26,7 @@ def process_stack_data():
         ],
         [
             sg.Listbox(
-                values=[], enable_events=True, size=(60, 20), key="-FILE LIST-"
+                values=[], enable_events=True, expand_x=True, size=(1, 10), key="-FILE LIST-"
             )
         ],
         [
@@ -35,12 +35,10 @@ def process_stack_data():
     ]
     
     figure_quest_form = [
-        [
-            sg.Text("Do you want to supress the figures?"),
-            sg.Button("Yes"),
-            sg.Button("No"),
-            sg.Checkbox("Include animation:", key="-CHECK BOX-")
-        ]
+            [sg.Text("Do you want to supress the figures?")],
+            [sg.Button("Yes"),
+             sg.Button("No")],
+            [sg.Checkbox("Include animation", key="-CHECK BOX-")]
     ]
     
     savedatalay = [
@@ -92,60 +90,62 @@ def process_stack_data():
                 rawstackname = []
     
         if event == "-PROC BUTT-":
-            questwin = sg.Window("Particle Analysis Python Edition V1.0", figure_quest_form)
-    
-            while True:
-                questevent, questval = questwin.read()
-    
-                if questevent == "Yes":
-                    plotfig = 0
-                    questwin.close()
-                if questevent == "No":
-                    plotfig = 1
-                    questwin.close()
-                if questwin["-CHECK BOX-"]:
-                    aniflag = 1
-                if not questwin["-CHECK BOX-"]:
-                    aniflag = 0
-    
-                if questevent == "Exit" or questevent == sg.WIN_CLOSED:
-                    break
-    
-            questwin.close()
-    
-            for i in rawstackdir:
-                data_list.append(sing_stack_proc_gui(i, plotfig))
-                if aniflag == 1 and plotfig == 1:
-                    ani.append(stack_movie(data_list[-1]))
-                    plt.show(block=False)
-    
-            savewin = sg.Window("Particle Analysis Python Edition V1.0", savedatalay)
-            while True:
-                saveevent, saveval = savewin.read()
-                dirsave = open(progdir + "\\" + "lastdirsave.txt", "r")
-                startdirsave = dirsave.read()
-                dirsave.close()
-    
-                if saveevent == "Yes":
-                    try:
-                        file_save = tkfilebrowser.askopendirname(title="Chose directory to save to", okbuttontext="Save",
-                                                                 initialdir=startdirsave)
-                    except:
-                        file_save = ""
-    
-                    if len(file_save) > 0:
-                        for i in range(len(data_list)):
-                            save_to_hdf5(data_list[i], file_save, rawstackdir[i].rsplit("\\", 1)[1])
-                        startdirsave = file_save
-                        dirsave = open(progdir + "\\" + "lastdirsave.txt", "w")
-                        dirsave.write(startdirsave)
-                        dirsave.close()
+            if not rawstackdir:
+                sg.popup("No Folders Selected")
+            else:
+
+                questwin = sg.Window("Particle Analysis Python Edition V1.0", figure_quest_form)
+
+                while True:
+                    questevent, questval = questwin.read()
+                    if questevent == "Exit" or questevent == sg.WIN_CLOSED:
+                        break
+                    if questevent == "Yes":
+                        plotfig = 0
+                        questwin.close()
+                    if questevent == "No":
+                        plotfig = 1
+                        questwin.close()
+                    if questval["-CHECK BOX-"]:
+                        aniflag = 1
+                    if not questval["-CHECK BOX-"]:
+                        aniflag = 0
+
+                questwin.close()
+
+                for i in rawstackdir:
+                    data_list.append(sing_stack_proc_gui(i, plotfig))
+                    if aniflag == 1 and plotfig == 1:
+                        ani.append(stack_movie(data_list[-1]))
+                        plt.show(block=False)
+
+                savewin = sg.Window("Particle Analysis Python Edition V1.0", savedatalay)
+                while True:
+                    saveevent, saveval = savewin.read()
+                    dirsave = open(progdir + "\\" + "lastdirsave.txt", "r")
+                    startdirsave = dirsave.read()
+                    dirsave.close()
+
+                    if saveevent == "Yes":
+                        try:
+                            file_save = tkfilebrowser.askopendirname(title="Chose directory to save to", okbuttontext="Save",
+                                                                     initialdir=startdirsave)
+                        except:
+                            file_save = ""
+
+                        if len(file_save) > 0:
+                            for i in range(len(data_list)):
+                                save_to_hdf5(data_list[i], file_save, rawstackdir[i].rsplit("\\", 1)[1])
+                            startdirsave = file_save
+                            dirsave = open(progdir + "\\" + "lastdirsave.txt", "w")
+                            dirsave.write(startdirsave)
+                            dirsave.close()
+                            savewin.close()
+                            window.close()
+                    if saveevent == "No":
                         savewin.close()
                         window.close()
-                if saveevent == "No":
-                    savewin.close()
-                    window.close()
-                if saveevent == "Exit" or saveevent == sg.WIN_CLOSED:
-                    break
+                    if saveevent == "Exit" or saveevent == sg.WIN_CLOSED:
+                        break
     
     window.close()
