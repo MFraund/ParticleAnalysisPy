@@ -1,6 +1,3 @@
-# This is a test script: It is a Python 3.9 conversion for the Particle Analysis Matlab program
-# This file is where the basic GUI will be developed and will call the functions that do the actual work
-
 import PySimpleGUI as sg
 import os.path
 import matplotlib

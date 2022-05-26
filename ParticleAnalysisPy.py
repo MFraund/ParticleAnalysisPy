@@ -1,5 +1,9 @@
+# This is a test script: It is a Python 3.9 conversion for the Particle Analysis Matlab program
+# This file is where the basic GUI will be developed and will call the functions that do the actual work
+
 import PySimpleGUI as sg
 from ProcessStackData import process_stack_data
+from CarbonMaps import carbon_maps
 
 layout = [
         [sg.Text("Particle Analysis Py", justification="center", font=(None, 15, ["bold", "italic"]))],
@@ -47,6 +51,7 @@ while True:
 
     if event == "CarbonMaps":
         sg.popup("Work in Progress")
+        carbon_maps()
 
     if event == "FullSpecCMaps":
         sg.popup("Work in Progress")

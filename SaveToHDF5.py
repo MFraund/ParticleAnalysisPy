@@ -12,7 +12,7 @@ def save_to_hdf5(data, directory, filename):
 
     file.create_group("Mantis")
     exchange_grp = file.create_group("exchange")
-    file.create_dataset("implements", data="information:exchange:spectromicroscopy:Mantis".encode("ascii"),)
+    file.create_dataset("implements", data="information:exchange:spectromicroscopy:Mantis".encode("ascii"))
     info_grp = file.create_group("information")
     file.create_group("spectromicroscopy")
     file.create_dataset("version", data="1.0.".encode("ascii"))
@@ -31,3 +31,29 @@ def save_to_hdf5(data, directory, filename):
 
     info_grp.create_dataset("comment", data="Converted in Mantis".encode("ascii"))
     info_grp.create_dataset("file_creation_datetime", data=datetime.now().strftime("%Y-%m-%dT%H:%M").encode("ascii"))
+
+    file.create_dataset("particle", data=data.particle.encode("ascii"))
+
+def load_from_hdf5(filename):
+    file = h5py.File(filename, 'r')
+
+    spectr = file["exchange/data"]
+    spectr = np.swapaxes(spectr, 0, 2)
+    spectr = np.swapaxes(spectr, 1, 2)
+    evenergy = np.array(file["exchange/energy"])
+    xvalue = float(np.array(file["exchange/x"]))
+    yvalue = float(np.array(file["exchange/y"]))
+    particle = file["particle"][()].decode("utf-8")
+
+    data = QuickDataStruct(spectr, evenergy, xvalue, yvalue, particle)
+
+    return data
+
+class QuickDataStruct:
+    def __init__(self, spectr, evenergy, xvalue, yvalue, particle):
+        self.spectr = spectr
+        self.eVenergy = evenergy
+        self.Xvalue = xvalue
+        self.Yvalue = yvalue
+        self.particle = particle
+
