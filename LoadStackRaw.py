@@ -5,7 +5,9 @@ class LoadStackRaw:
     def __init__(self, filedir):
         os.chdir(filedir)
         filestruct = os.listdir(filedir)
-        self.particle = "" # for future use
+
+        # for future use
+        self.particle = ""
 
         firstrun = 0
 

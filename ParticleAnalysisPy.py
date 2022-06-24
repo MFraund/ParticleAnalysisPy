@@ -50,7 +50,6 @@ while True:
         sg.popup("Work in Progress")
 
     if event == "CarbonMaps":
-        sg.popup("Work in Progress")
         carbon_maps()
 
     if event == "FullSpecCMaps":
