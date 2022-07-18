@@ -1,7 +1,7 @@
 import os.path
 import tkfilebrowser
 from SaveToHDF5 import load_from_hdf5
-from SaveToHDF5 import save_to_hdf5
+from SaveToHDF5 import append_carbon_to_hdf5
 import numpy as np
 import PySimpleGUI as sg
 import matplotlib
@@ -48,9 +48,7 @@ def carbon_maps():
                                    [sg.Yes(s=10), sg.No(s=10)]], disable_close=True).read(close=True)
 
         if save_question[0] == 'Yes':
-            filename = file_chosen.rsplit("\\", 1)[1].removesuffix('.hdf5')
-            filedir = file_chosen.rsplit("\\", 1)[0]
-            save_to_hdf5(snew, filedir, filename)
+            append_carbon_to_hdf5(snew, file_chosen)
 
     return
 
@@ -276,11 +274,18 @@ def carbon_map_creator(snew, data_file, *args):
         bw[finsp2mask >= 0.5] = 1
 
         imstruct = regionprops(bw.astype(int))
-        ecc = np.reshape(imstruct[0].eccentricity, np.shape(imstruct))
-        major = np.reshape(imstruct[0].major_axis_length, np.shape(imstruct))
-        minor = np.reshape(imstruct[0].minor_axis_length, np.shape(imstruct))
-        cvex = np.reshape(imstruct[0].convex_area, np.shape(imstruct))
-        area = np.reshape(imstruct[0].area, np.shape(imstruct))
+        if len(imstruct) == 0:
+            ecc = []
+            major = []
+            minor = []
+            cvex = []
+            area = []
+        else:
+            ecc = np.reshape(imstruct[0].eccentricity, np.shape(imstruct))
+            major = np.reshape(imstruct[0].major_axis_length, np.shape(imstruct))
+            minor = np.reshape(imstruct[0].minor_axis_length, np.shape(imstruct))
+            cvex = np.reshape(imstruct[0].convex_area, np.shape(imstruct))
+            area = np.reshape(imstruct[0].area, np.shape(imstruct))
 
         snew.sooteccentricity = ecc
         snew.sootmajoraxislength = major

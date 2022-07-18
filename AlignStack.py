@@ -1,10 +1,12 @@
 import numpy as np
 from DFTRegistration import dft_registration
+from copy import deepcopy
 
 def align_stack(stack):
-    s = stack
+    s = deepcopy(stack)
+    stackcontainer = stack.spectr.copy()
 
-    [emax, ymax, xmax] = s.spectr.shape
+    emax, ymax, xmax = stackcontainer.shape
 
     xresolution = s.Xvalue/xmax
     yresoltuion = s.Yvalue/ymax
@@ -16,8 +18,8 @@ def align_stack(stack):
     shifts = np.zeros((emax, 4))
 
     for k in range(emax):
-        shifts[k, :] = dft_registration(np.fft.fft2(s.spectr[int(center)]), np.fft.fft2(s.spectr[k]), 50)
-        spectr[k] = ft_matrix_shift(s.spectr[k], -shifts[k, 2], -shifts[k, 3])
+        shifts[k, :] = dft_registration(np.fft.fft2(stackcontainer[int(center)]), np.fft.fft2(stackcontainer[k]), 50)
+        spectr[k] = ft_matrix_shift(stackcontainer[k], -shifts[k, 2], -shifts[k, 3])
 
     shiftymax = np.ceil(np.max(shifts[:, 2]))
     shiftxmax = np.ceil(np.max(shifts[:, 3]))
@@ -50,6 +52,6 @@ def ft_matrix_shift(a, dy, dx):
     yphase = yphase.T
     xphase = np.rot90(xphase)
 
-    b = np.abs(np.fft.ifft2(np.fft.fft2(a)) * yphase * xphase)
+    b = np.abs(np.fft.ifft2(np.fft.fft2(a) * yphase * xphase))
 
     return b

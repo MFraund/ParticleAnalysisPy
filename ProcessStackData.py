@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from SingStackProcGUI import sing_stack_proc_gui
 from SingStackProcGUI import stack_movie
 import tkfilebrowser
-from SaveToHDF5 import save_to_hdf5
+from SaveToHDF5 import save_spectr_to_hdf5
+import numpy as np
 
 
 def process_stack_data():    
@@ -132,7 +133,7 @@ def process_stack_data():
 
                         if len(file_save) > 0:
                             for i in range(len(data_list)):
-                                save_to_hdf5(data_list[i], file_save, rawstackdir[i].rsplit("\\", 1)[1])
+                                save_spectr_to_hdf5(data_list[i], file_save, rawstackdir[i].rsplit("\\", 1)[1])
                             startdirsave = file_save
                             dirsave = open(progdir + "\\" + "lastdirsave.txt", "w")
                             dirsave.write(startdirsave)

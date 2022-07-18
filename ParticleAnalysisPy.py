@@ -4,6 +4,7 @@
 import PySimpleGUI as sg
 from ProcessStackData import process_stack_data
 from CarbonMaps import carbon_maps
+#from DirLabelStruct import dir_label_struct
 
 layout = [
         [sg.Text("Particle Analysis Py", justification="center", font=(None, 15, ["bold", "italic"]))],
@@ -45,6 +46,7 @@ while True:
 
     if event == "DirLabelStruct":
         sg.popup("Work in Progress")
+        #dir_label_struct()
 
     if event == "StackLab":
         sg.popup("Work in Progress")

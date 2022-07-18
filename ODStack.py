@@ -3,13 +3,14 @@ from scipy.ndimage.filters import median_filter
 from skimage import exposure
 from skimage.filters import threshold_otsu
 import matplotlib.pyplot as plt
+from copy import deepcopy
 
 
 def od_stack(structin, method, plotflag):
-    stack = structin.spectr
+    stack = structin.spectr.copy()
     evlength = len(structin.eVenergy)
 
-    s = structin
+    s = deepcopy(structin)
     s.spectr = np.zeros((structin.spectr.shape[0], structin.spectr.shape[1], structin.spectr.shape[2]))
 
     if method == 'C':
@@ -48,7 +49,7 @@ def od_stack(structin, method, plotflag):
         buffer = stack[cnt]
         izero[cnt, 1] = np.mean(np.mean(buffer[mask == 1]))
 
-    s.izero = izero
+    s.izero = izero.copy()
 
     for k in range(evlength):
         s.spectr[k] = -np.log(stack[k]/izero[k, 1])
@@ -97,6 +98,6 @@ def od_stack(structin, method, plotflag):
 
 def mat2_gray(inmat):
     limits = [np.min(inmat), np.max(inmat)]
-    delta = limits[1] - limits[0]
-    outmat = (inmat - limits[0]) / delta
+    delta = 1 / (limits[1] - limits[0])
+    outmat = (inmat - limits[0]) * delta
     return outmat
