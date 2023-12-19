@@ -54,7 +54,7 @@ def read_hdr(file):
             line = filestream.readline()
             pos1 = line.find("(")
             pos2 = line.find(")")
-            energyvec = np.array(line[pos1 + 1:pos2].split(', ')).astype(np.float)
+            energyvec = np.array(line[pos1 + 1:pos2].split(', ')).astype(float)
             evenergy = np.atleast_2d(energyvec[1:len(energyvec)]).conj().T
         elif pos3 != -1:
             pos4 = line.find("; YRange =")

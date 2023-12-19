@@ -13,6 +13,8 @@ from skimage.measure import regionprops
 from skimage.segmentation import clear_border
 from skimage.filters import threshold_otsu
 from skimage.morphology import remove_small_objects
+from Initiate_Struct import initiate_carbon_struct
+import pickle as pkl
 
 def carbon_maps():
     # User interface for selecting file to be processed
@@ -28,8 +30,8 @@ def carbon_maps():
     dirsave.close()
 
     try:
-        file_chosen = tkfilebrowser.askopenfilename(title="Pick a .hdf5 file with the processed data",
-                                                    okbuttontext="Select", initialdir=startdirbros, filetypes=[("HDF5", "*.hdf5")])
+        file_chosen = tkfilebrowser.askopenfilename(title="Pick a .pkl file with the processed data",
+                                                    okbuttontext="Select", initialdir=startdirbros, filetypes=[("Pickle", "*.pkl")])
     except:
         file_chosen = ""
 
@@ -40,7 +42,8 @@ def carbon_maps():
     dirsave.close()
 
     if file_chosen != "":
-        data = load_from_hdf5(file_chosen)
+        # data = load_from_hdf5(file_chosen)
+        data = initiate_carbon_struct(file_chosen)
         snew = carbon_map_creator(data, file_chosen)
 
         save_question = sg.Window('Particle Analysis Python Edition V1.0',
@@ -48,7 +51,9 @@ def carbon_maps():
                                    [sg.Yes(s=10), sg.No(s=10)]], disable_close=True).read(close=True)
 
         if save_question[0] == 'Yes':
-            append_carbon_to_hdf5(snew, file_chosen)
+            # append_carbon_to_hdf5(snew, file_chosen)
+            with open(file_chosen,'w+b') as openedfile:
+                pkl.dump(snew, openedfile)
 
     return
 
@@ -96,16 +101,17 @@ def carbon_map_creator(snew, data_file, *args):
         spthresh = spthresh/100
 
     if nofig == 0 and len(energy) < 6:
-        plt.figure(tight_layout = True)
-        plt.title(snew.particle + " Single Energy Images")
+        plt.figure(layout = 'tight')
+        plt.axis('off')
+        plt.title(snew.particle + " Single Energy Images\n")
         for i in range(len(energy)):
             plt.subplot(int(str(subdim)+str(subdim)+str(i+1)))
-            plt.imshow(stack[i, :, :], extent=[0, snew.Xvalue, snew.Yvalue, 0])
+            plt.imshow(stack[i, :, :], extent=(0, snew.Xvalue, snew.Yvalue, 0))
             plt.axis('image')
             plt.xlabel("X (\u03BCm)")
             plt.ylabel("Y (\u03BCm)")
             plt.set_cmap('gray')
-            plt.colorbar()
+            plt.colorbar(pad=-0.01)
             plt.title('eV' + str(energy[i]))
 
     if figsav == 1:
@@ -180,17 +186,20 @@ def carbon_map_creator(snew, data_file, *args):
     # Carbon Map
     carb = stack[postidx, :, :] - stack[preidx, :, :]
     if nofig == 0:
-        plt.figure(tight_layout=True)
-        plt.title(snew.particle + " Maps")
+        plt.figure(layout = 'tight')
+        plt.axis('off')
+        plt.title(snew.particle + " Maps\n")
+
         plt.subplot(221)
-        plt.imshow(carb, extent=[0, snew.Xvalue, snew.Yvalue, 0])
+        #plt.tight_layout()
+        plt.imshow(carb, extent=(0, snew.Xvalue, snew.Yvalue, 0))
         plt.set_cmap('gray')
-        plt.colorbar()
         plt.clim(0, np.amax(carb))
         plt.axis('image')
-        plt.title('PostEdge-PreEdge')
+        plt.colorbar(pad=-0.01)
         plt.xlabel('X (\u03BCm)')
         plt.ylabel('Y (\u03BCm)')
+        plt.title('PostEdge-PreEdge')
 
     carb1 = carb.copy()
     carb1[carb1 < 0] = 0
@@ -214,11 +223,12 @@ def carbon_map_creator(snew, data_file, *args):
     prepost = prepost * premask * binmap
     if nofig == 0:
         plt.subplot(222)
-        plt.imshow(prepost, extent=[0, snew.Xvalue, snew.Yvalue, 0])
+        #plt.tight_layout()
+        plt.imshow(prepost, extent=(0, snew.Xvalue, snew.Yvalue, 0))
         plt.set_cmap('gray')
-        plt.colorbar()
         plt.axis('image')
         plt.clim(0, 1.0)
+        plt.colorbar(pad=-0.01)
         plt.xlabel('X (\u03BCm)')
         plt.ylabel('Y (\u03BCm)')
         plt.title('PreEdge/PostEdge')
@@ -243,11 +253,12 @@ def carbon_map_creator(snew, data_file, *args):
         sp2 = (stack[int(sp2idx), : , :] - stack[int(preidx), :, :]) / (stack[int(postidx), : , :] - stack[int(preidx), :, :]) * (0.4512 / 0.8656) * spmask
         if nofig == 0:
             plt.subplot(223)
-            plt.imshow(sp2, extent=[0, snew.Xvalue, snew.Yvalue, 0])
+            #plt.tight_layout()
+            plt.imshow(sp2, extent=(0, snew.Xvalue, snew.Yvalue, 0))
             plt.set_cmap('gray')
             plt.clim(0, 1.0)
             plt.axis('image')
-            plt.colorbar()
+            plt.colorbar(pad=-0.01)
             plt.xlabel('X (\u03BCm)')
             plt.ylabel('Y (\u03BCm)')
             plt.title('sp^2 Map')
@@ -339,11 +350,12 @@ def carbon_map_creator(snew, data_file, *args):
     labelstr = ['OC', 'In', 'EC']
 
     compsize = np.zeros((numpart, len(labelstr) + 1))
-    partlabel = []
-    for i in range(numpart):
-        partlabel.append('')
-        for j in range(len(labelstr)):
-            a1, b1 = np.nonzero(labelmat == i)
+    partlabel = [[]] * numpart
+    labelnum = 1
+    for i in range(0, numpart):
+        partlabel[i] = ''
+        for j in range(0, len(labelstr)):
+            a1, b1 = np.nonzero(labelmat == labelnum)
             a2, b2 = np.nonzero(bincompmap[j] > 0)
             if (np.size(a1) != 0) and (np.size(b1) != 0) and (np.size(a2) != 0) and (np.size(b2) != 0):
                 linidx1 = np.ravel_multi_index((a1, b1), dims = np.shape(labelmat))
@@ -353,6 +365,7 @@ def carbon_map_creator(snew, data_file, *args):
                     partlabel[i] = partlabel[i] + labelstr[j]
                     compsize[i , j] = len(idxcom)
 
+        labelnum = labelnum + 1
         if np.size(partlabel[i]) == 0:
             partlabel[i] = 'NoID'
 
@@ -392,13 +405,12 @@ def carbon_map_creator(snew, data_file, *args):
     # Combined Masks
     if nofig == 0:
         plt.subplot(224)
-        plt.imshow(np.uint8(rgbmat.transpose((1, 2, 0))), extent=[0, snew.Xvalue, snew.Yvalue, 0])
-        # plt.xticks(xdat)
-        # plt.yticks(ydat)
-        plt.title('Red = sp2 > ' + str(spthresh) + '\nBlue = pre/post > 0.5\nGreen = Organic')
+        #plt.tight_layout()
+        plt.imshow(np.uint8(rgbmat.transpose((1, 2, 0))), extent=(0, snew.Xvalue, snew.Yvalue, 0))
         plt.axis('image')
         plt.xlabel('X (\u03BCm)')
         plt.ylabel('Y (\u03BCm)')
+        plt.title('Red = sp2 > ' + str(spthresh) + '\nBlue = pre/post > 0.5\nGreen = Organic')
         plt.show()
         if figsav == 1:
             filename = str(rootdir) + str(sample) + str(snew.particle) + '_Maps.png'

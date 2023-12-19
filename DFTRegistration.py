@@ -10,7 +10,7 @@ def dft_registration(buf1ft, buf2ft, usfac = 1):
         rfzero = np.sum(np.power(np.abs(buf1ft[:]), 2))
         rgzero = np.sum(np.power(np.abs(buf2ft[:]), 2))
         error = 1.0 - ccmax * ccmax.conj()/(rgzero * rfzero)
-        error = np.sqrt(np.abs(error))
+        error = np.sqrt(np.abs(error))[0][0]
         diffphase = np.arctan2(np.imag(ccmax), np.real(ccmax))
         output = [error, diffphase]
 
@@ -25,7 +25,7 @@ def dft_registration(buf1ft, buf2ft, usfac = 1):
         rfzero = np.sum(np.power(np.abs(buf1ft[:]), 2)) / (m*n)
         rgzero = np.sum(np.power(np.abs(buf2ft[:]), 2)) / (m*n)
         error = 1.0 - ccmax * ccmax.conj() / (rgzero[1, 1] * rfzero[1, 1])
-        error = np.sqrt(np.abs(error))
+        error = np.sqrt(np.abs(error))[0][0]
         diffphase = np.arctan2(np.imag(ccmax), np.real(ccmax))
         md2 = np.fix(m / 2)
         nd2 = np.fix(n / 2)
@@ -97,7 +97,7 @@ def dft_registration(buf1ft, buf2ft, usfac = 1):
             rf00 = np.sum(np.sum(buf2ft * buf2ft.conj())) / m / n
 
         error = 1.0 - ccmax * ccmax.conj() / (rg00 * rf00)
-        error = np.sqrt(np.abs(error))
+        error = np.sqrt(np.abs(error))[0][0]
         diffphase = np.arctan2(np.imag(ccmax), np.real(ccmax))
 
         if md2 == 1:
